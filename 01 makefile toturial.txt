@@ -1,5 +1,7 @@
 Why do Makefile exist?
-Makefile are used to help decide which parts of a large program need to be recomplied. In the vast majority of cases, C or C++ file are compiled. Other languages typically have their own tools that serve a similar purpose as Make. Make can also be used beyond(vượt ra) compilation too, when you need a series of instructions to run depending on what files have changed. This tutorial will forcus on the C/C++ compilation use case.
+Makefile are used to help decide which parts of a large program need to be recomplied. In the vast majority of cases, C or C++ file are compiled.
+Other languages typically have their own tools that serve a similar purpose as Make. Make can also be used beyond(vượt ra) compilation too, when 
+you need a series of instructions to run depending on what files have changed. This tutorial will forcus on the C/C++ compilation use case.
 
 Here's an example dependency graph that you might build with Make. If any file's dependencies changes, then the file will get recompiled:
 
@@ -33,8 +35,133 @@ the targets are file names, separated by spaces. Typically, there is only one pe
 the commands are a series of steps typically used to make the target(s). These need to start with a tab character, not spaces.
 the prerequisites are also file names, separated by spaces. These files need to exist before the commands for the target are run. These are also called dependencies.
 
-The essence of Make
+The essence(bản chất) of Make
 Let's start with a hello world example:
+hello:
+	echo "hello, World"
+	echo "This line will print if the hello does not exitst."
+There's already a lot to take in here. Let's break it down:
 	We have one target called hello
 	This target has two commands
 	This target has no prerequisites
+We'll then run make hello. As long as the hello file does not exist, the command will run. If hello does exist. no commands will run.
+It's important to realize that I'm talking about hello as both a target and a file. That's because the two are directly tied (gắn kết) together.
+Typically, when a target is run(aka when the commands of the target are run), the commands will create a file with the aame name as the target. In this case, the hello target does not create the hello file
+
+Let's create a more typical Makefile( tạo một file makefile điển hình) - one that compiles as a single C file. But before we do, make a file called blah.c that has the following contents:
+//blah.c
+int main(){ return 0;}
+then create the Makefile( called Makefile, as always):
+blah:
+	cc blah.c -o blah
+This time, try simply running make. Since there's no target supplied as an argument to the make command, the first target is run, In this case, there's only one target(blah). The first time you run this, blah will be created. 
+The second time, you'll see make: 'blah' is up to date. That's because the blah file already exists. But there's a problem: if we modify blah.c and then run make, nothing gét recompiled.
+
+We solve this by adding a prerequisite:
+blah: blah.c
+	cc blah.c -o blah
+When we run make again, the following set of steps happens:
+	The first target is selected, because the first target is the default target
+	This has a prerequisite of blah.c
+	Make decides if it should run the blah target. It will only run if blah does's exist, or blah.c is newer than blah.
+
+This last step is critical, and is the essence of make. What it's attempting(cố gắng) to do is decide if the prerequisites of blah have changed since blah
+was last compiled. THat is, if blah.c is modified, running make should recompile the file. And converserly(Ngược lại), if blah.c has not changed, then it should not be recompiled.
+
+To make this happen, it uses the file system timestamps as a proxy(người đại diện) to determine if something has changesd. This is a reasonable heuristic( sự tìm tòi), because file timestamps typically will only change if the files are modified. But it's important to realize that this isn't
+always the case. You could, for example, modify a file, and then change the modified timestamp of  that file to something old. If you did, Make would incorrectly guess that the file hadn't changed and thus could be ignored.\
+
+Whew, what a mouthful(ngon miệng). Make sure that you understan this. It's the crux(mấu chốt) of Makefiles, and might take you a few minutes to properly understand. Play around with the above examples or watch the video above if things are still confusing.
+
+More quick examples
+The following Makefile ultimatedly(cuối cùng) runs all three targets. When you run make in terminal, it will build a program called blah in a series of steps:
+	Make selects the target blah, because the first target is the default target
+	blah requires blah.o, so make searches for the blah.o target
+	blah.o requires blah.c, so make searches for the blah.c target
+	blah.c has no dependencies, so the echo command is run
+	the cc-c command is then run, because all of the blah.o dependencues are finished
+	the top cc command is run, because all the blah dependencies are finished
+	That's it: blah is a compiled c program
+blah: blah.o
+	cc blah.o -o blah # runs third
+blah.o blah.c
+	cc- c blah.c -o blah.o # Runs second
+
+#Typically blah.c would already exist, but I want to limit any additional required files
+blah.c:
+	echo "init main(){return 0;}" > blah.c # Runs first
+
+If you delete blah.c, all three targets will be rerun. If you edit it(and thus change the timestamp to newer than blah.o), the first two targets will run,
+If you run touch blah.o (and thus change the timestamp to newer than blah), then only the first target will run. If you change nothing, none of the targets will riun. Try it out!
+
+This next example doesn't do anything new, but is nontheless( dù sao đi nữa) a good additional example. It will always run both targets, because some_file depends on other_file, which is never created.
+
+some_file: other_file
+	echo "This will always run, and runs send"
+	touch some_file
+other_file:
+	echo "This will always run, and runs first"
+Make clean
+clean is offen as a target that removes the output of other targets, but it is not a special word in Make. You can run make and make clean on this to create and delete some_file.
+
+Note that clean is doing two new things here:
+	It's a target that is not first(the default), and not a prerequisite. THat means it'll never run unless you explicitly(rõ ràng) call make clean
+	It's not intended( dự định) to be a filename. If you happen to have a file named clean, this target won't run, which is not what we want. See .PHONY later in this tutorial on how to fix this
+
+some_file:
+	touch some_file
+clean:
+	rm -f some_file
+Variables
+Variables can only be strings. You'll typically want to use := but = also work. See Variables Pt 2.
+
+Here's an example of using variables:
+
+files : file1 file2
+some_file: $(files)
+	echo "Look at this variable: " $(files_
+	touch some_file
+
+file1:
+	touch file1
+file2:
+	touch file2
+
+clean:
+	rm -f file1 file2 some_file
+
+Single or double quotes have no meaning to Make. They are simply characters that are assigned to the variable. Quotes are usefull to shell/bash, thoughm and yoy need them in commands like 
+printf. In this example, the two commands behave the same:
+
+a := one two # a is set to the string "one two"
+b := 'one two' not recommended. b is set to the string "'one two'"
+all:
+	printf '$a'
+	printf $b
+Reference variables using either ${} or $()
+x := dude
+all:
+	echo $(x)
+	echo ${x}
+
+	# Bad pratice, but works
+	echo $x
+
+Targets
+the all target
+Making multiple targets and you want all of them to run? Make an all target. Since this the first rule listed, it will run by default if make is called without specifying a target.
+
+all: one two three
+
+one: 
+	touch one
+two:
+	touch two
+three:
+	touch three
+
+clean:
+	rm -f one two three
+
+Multiple targets
+When there are multiple targets for a rule, the commands will be run for each target

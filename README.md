@@ -1,5 +1,5 @@
 # Introduction
-The repo have porpose to learn makefile. It based on [makefile toturial ](https://makefiletutorial.com/).
+The repo is intended for learning how to use makefile. It is based on a [makefile toturial ](https://makefiletutorial.com/).
 
 **Thank**
 

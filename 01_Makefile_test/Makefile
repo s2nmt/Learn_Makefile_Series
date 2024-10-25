@@ -1,19 +1,28 @@
-objects = foo.o bar.o all.o
-all: $(objects)
-	$(CC) $^ -o all
+# Compiler
+CC = gcc
 
-# Syntax - targets ...: target-pattern: prereq-patterns ...
-# In the case of the first target, foo.o, the target-pattern matches foo.o and sets the "stem" to be "foo".
-# It then replaces the '%' in prereq-patterns with that stem
-$(objects): %.o: %.c
-	$(CC) -c $^ -o $@
+# Danh sách các tệp nguồn
+src_files = main.c utils.c helper.c test.c
 
-all.c:
-	echo "int main() { return 0; }" > all.c
+# Lọc các tệp .c và lưu vào biến c_files
+c_files = $(filter %.c, $(src_files))
 
-# Note: all.c does not use this rule because Make prioritizes more specific matches when there is more than one match.
-%.c:
-	touch $@
+# Danh sách tệp đối tượng tương ứng với các tệp .c
+obj_files = $(patsubst %.c, %.o, $(c_files))
 
+# Mục tiêu chính
+all: $(obj_files)
+
+# Quy tắc để biên dịch tệp .c thành tệp .o
+%.o: %.c
+	$(CC) -c $< -o $@
+
+# Mục tiêu để in ra danh sách tệp
+print:
+	@echo "Tệp nguồn: $(src_files)"
+	@echo "Tệp .c: $(c_files)"
+	@echo "Tệp đối tượng: $(obj_files)"
+
+# Mục tiêu để dọn dẹp
 clean:
-	rm -f *.c *.o all
+	rm -f $(obj_files)

@@ -12,9 +12,12 @@ There are a variety of implementations of Make, but most of this guide will work
 
 ## Running the Examples 
 To run these examples, you'll need a terminal and "make" installed. For each example, put the contents in a file called Makefile, and in the directory run the command make. Let's start with the simplest of Makefiles.
+
 ![alt text](image.png)
+
 Note: Makefiles must be indented using TABs and not spaces or Make will fail.
 Here is the output of running the above example"
+
 ![alt text](image-1.png)
 
 ## Makefile Syntax

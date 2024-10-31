@@ -4,9 +4,9 @@
 ## Implicit Rules
 
 Make loves c compilation. And every time it expresses its love, things get confusing. Perhaps the most confusing part of Make is the magic/automatic rules that are made. Make calls these "implicit" rules. I don't personally agree with this design decision, and i dont recommend using them, but they're often used and are thus useful to know. Here's a list of implicit rules:
-- Compiling a C prohram: n.o is made automatically from n.c with a command of the form $(CC) -c $(CPPFLAGS) $(CFLAGS) $^ -o $@
-- Compiling a C++ program: n.o is made automatically from n.cc or n.cpp with a command of the form $(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
-- Linking a single object file: n is made automatically from n.o by running the command $(CC) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -o $@ 
+- Compiling a C prohram: n.o is made automatically from n.c with a command of the form \$(CC) -c $(CPPFLAGS) \$(CFLAGS) \$^ -o $@
+- Compiling a C++ program: n.o is made automatically from n.cc or n.cpp with a command of the form /$(CXX) -c /$(CPPFLAGS) /$(CXXFLAGS) /$^ -o $@
+- Linking a single object file: n is made automatically from n.o by running the command /$(CC) /$(LDFLAGS) /$^ /$(LOADLIBES) /$(LDLIBS) -o $@ 
 
 The important variables used by implicit rules are:
 
@@ -179,7 +179,7 @@ Double-Colon Rules are rarely used, but allow multiple rules to be defined for t
         echo "hello"
     blah:: 
         echo "hello again"
-        
+
 **Result**
 
     echo "hello"

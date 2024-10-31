@@ -64,6 +64,7 @@ After use make command. This create new file .exe
 This time, try simply running make. Since there's no target supplied as argument to the make command, the first target is run. In this case, there's only one target (blah). The first time you run this, blah will be created. The second time, you'll see make: 'blah' is up to date. That's because the blah file already exists. But there's a problem. If we modify blah.c and then run make, nothing gets recompiled.
 
 We solve this by adding a prerequisite:
+
 ![alt text](image-7.png)
 
 When we run make again, the following set of steps happens:
@@ -87,51 +88,53 @@ The following Makefile ultimately runs all three targets. When you run make in t
     The top cc command is run, because all the blah dependecies are finished.
     That's it: blah is a compiled c program
 
-blah: blah.o
-    cc blah.o -o blah
-blah.o : blah.c
-    cc -c blah.c -o blah.o # Runs second
-    #Typically blah.c would already exist, but I want to limit any additional required files
-blah.c:
-    echo "int main() {return 0; }" > blah.c # Runs first
+    blah: blah.o
+        cc blah.o -o blah
+    blah.o : blah.c
+        cc -c blah.c -o blah.o # Runs second
+        #Typically blah.c would already exist, but I want to limit any additional required files
+    blah.c:
+        echo "int main() {return 0; }" > blah.c # Runs first
 
 If you delete blah.c, all three targets will be rerun. If you edit it( and thus change the timestamp to newer than blah.o), the first two targets will run, if you run touch blah.o (and thus change the timestamp to newer than blah), then only the first target will run. If you change nothing, none of the targets will run. Try it out!
 
 This next example doesn't do anything new, but is nontheless a good additional example. It will always run both targets, because some_file depends on other_file, which is never created.
 
-some_file: other_file
-    echo "This will always run, and runs second"
-    touch some_file
-other_file:
-    echo "This will always run, and runs first"
+    some_file: other_file
+        echo "This will always run, and runs second"
+        touch some_file
+    other_file:
+        echo "This will always run, and runs first"
 
-Make clean
+**Make clean**
     clean such as target. It often removes the output of other targets, but it is not a special word in Make. Run make to create some_file and run make clean to delete some_file.
 Note that clean is doing two new things here:
     - It's a target that is not first (the default), and not a prerequisite. That means it'll never run unless you explicitly call make clean
     - It's not intended to be a filename. If you happen to have a file named clean, this target won't run, which is not what we want. See .PHONY later in this tutorial on how to fix this.
 
-some_file:
-    touch some_file
-clean:
-    rm -f some_file
-Variables
+    some_file:
+        touch some_file
+    clean:
+        rm -f some_file
+
+**Variables**
 Variables can only be strings. You'll typically want to use :=, but = also work. See Variables Pt 2.
 Here's an example of using variables:
 
-files := file1 file2
-some_file: $(files)
-    echo "Look at this variable:  " $(files)
-    touch some_file
-file1:
-    touch file1
-file2:
-    touch file2
+    files := file1 file2
+    some_file: $(files)
+        echo "Look at this variable:  " $(files)
+        touch some_file
+    file1:
+        touch file1
+    file2:
+        touch file2
 
-clean:
-    rm -f file1 file2 some_file
+    clean:
+        rm -f file1 file2 some_file
 
-**Result**
+Result
+
 ![alt text](image-8.png)
 
 Single or double quotes have no meaning to Make. They are simply characters that are assigned to the variable. Quotes are usefull to shell/bash, though, and you need them in commands like printf. In this example, the two commands behave the same:

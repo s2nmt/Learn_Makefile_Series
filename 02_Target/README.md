@@ -6,6 +6,7 @@ Make multiple targets and you want all of them to run? Make an all target. Since
 ![alt text](image-13.png)
 
 Result:
+
 ![alt text](image-14.png)
 
 **Multiple targets**

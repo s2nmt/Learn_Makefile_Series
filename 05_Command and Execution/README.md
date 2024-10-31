@@ -3,11 +3,14 @@
 ## Command Echoing/Silencing
 Add an @ before a command to stop it from being printed
 You can also run make with -s to add an @ before each line
+
     all:
         @echo "This make line will not be printed"
         echo "But this will"
+
 ## Command Execution
 Each command is run in a new shell (or at least the effect is as such)
+
     all: 
         cd ..
         # The cd above does not affect this line, because each command is effectively run in a new shell
@@ -43,12 +46,14 @@ The default shell is /bin/sh. You can change this by chaning the variable SHELL:
         echo "Hello from bash"
 
 **Result**
+
     echo "Hello from bash"
     Hello from bash
 
 ## Double dollar sign
 If you want a string to have a dollar sign, you can use $$. This is hown to use a shell variable in bash or sh.
 Note the differences between Makefile variables and Shell variables in this next sample.
+
     make_var = I am a make variable
     all:
     # Same as running "sh_var='I am a shell variable'; echo $sh_var" in the shell

@@ -16,4 +16,5 @@ When there are multiple targets for a rule, the commands will be run for each ta
 ![alt text](image-15.png)
 
 Result:
+
 ![alt text](image-16.png)

@@ -138,3 +138,17 @@ Result
 ![alt text](image-8.png)
 
 Single or double quotes have no meaning to Make. They are simply characters that are assigned to the variable. Quotes are usefull to shell/bash, though, and you need them in commands like printf. In this example, the two commands behave the same:
+
+![alt text](image-9.png)
+
+Result:
+![alt text](image-10.png)
+
+Reference variables using either ${} or $()
+
+![alt text](image-11.png)
+
+Result:
+
+![alt text](image-12.png)
+

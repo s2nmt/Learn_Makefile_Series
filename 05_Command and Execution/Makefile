@@ -1,7 +1,16 @@
-make_var = I am a make variable
-all:
-# Same as running "sh_var='I am a shell variable'; echo $sh_var" in the shell
-	sh_var='I am a shell variable'; echo $$sh_var
+.EXPORT_ALL_VARIABLES:
+new_contents = "hello:\n\techo \$$(cooly)"
 
-# Same as running "echo I am a make variable" in the shell
-	echo $(make_var)
+cooly = "The subdirectory can see me!"
+# This would nullify the line above: unexport cooly
+
+all:
+	mkdir -p subdir
+	printf $(new_contents) | sed -e 's/^ //' > subdir/makefile
+	@echo "---MAKEFILE CONTENTS---"
+	@cd subdir && cat makefile
+	@echo "---END MAKEFILE CONTENTS---"
+	cd subdir && $(MAKE)
+
+clean:
+	rm -rf subdir

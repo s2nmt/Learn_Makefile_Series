@@ -70,7 +70,9 @@ Add -i to mkae to have this happen for every command
         # This error will be printed but ignored, and make will continue to rung
         -flase
         touch one
+        
 **Result**
+
     # This error will be printed but ignored, and make will continue to run
     false
     make: [Makefile:3: one] Error 1 (ignored)
@@ -92,6 +94,7 @@ To recursively call a makefile, use the special $(MAKE) instead of make becaude 
         rm -rf subdir
 
 **Result:**
+
     mkdir -p subdir
     printf "hello:\n\ttouch inside_file"> subdir/makefile
     cd subdir && /usr/bin/make
@@ -109,7 +112,9 @@ When Make starts, it automatically creates Make variables out of all the envirom
 
         # Print out the Make variable
         echo $(shell_env_var)
+
 **Result:**
+
     # Print out the Shell variable
     echo $shell_env_var
 
@@ -172,7 +177,9 @@ You need to export variables to have them run in the shell as well.
         @echo $$one
         @echo $(two)
         @echo $$two
-** Result **
+
+**Result**
+
     this will only work locally
 
     we can run subcommands with this
@@ -181,6 +188,7 @@ You need to export variables to have them run in the shell as well.
 There is a blank line because $$ prints the value of a shell variable. Since itâ€™s not exported, it outputs a blank line.
 
 .EXPORT_ALL_VARIABLES exports all variables for you.
+
     .EXPORT_ALL_VARIABLES:
     new_contents = "hello:\n\techo \$$(cooly)"
 
@@ -199,6 +207,7 @@ There is a blank line because $$ prints the value of a shell variable. Since itâ
         rm -rf subdir
 
 **Result**
+
     mkdir -p subdir
     printf "hello:\n\techo \$(cooly)" | sed -e 's/^ //' > subdir/makefile
     ---MAKEFILE CONTENTS---

@@ -121,7 +121,7 @@ You can override variables that come from the command line by using override. He
 
 If i use make option_one=hi, it will still echo did_override because of the override directive, However, when i use make option_two=hi, it will echo hi.
 
-## list of commands and define
+## List of commands and define
 
 The define directive is not a function, though it may look that way. I've seen it used so infrequently that I won't go into details, but it's mainly used for defining canned recipes and also pairs well with the eval function.
 
@@ -147,3 +147,35 @@ Define / endef simply creates a variable that is set to a list of commands. Note
     This does not print 'I was set' because each command runs in a separate shell
 
 Each line inside two runs in a separate shell, as Make treats each line of a multi-line variable as a distinct command.
+
+## Target-specific variables
+
+Variables can be set for specific targets
+
+    all: one = cool
+
+    all: 
+        echo one is defined: $(one)
+
+    other:
+        echo one is nothing: $(one)
+
+**Result**
+
+    echo one is defined: cool
+    one is defined: cool
+
+## Pattern-specific variables
+
+You can set variables for specific target patterns
+
+    %.c: one = cool
+
+    blah.c: 
+        echo one is defined: $(one)
+    other:
+        echo one is nothing: $(one)
+    
+**Result**
+    echo one is defined: cool
+    one is defined: cool    

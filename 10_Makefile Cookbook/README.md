@@ -1,56 +1,38 @@
 # Makefile Cookbook
 
-    Let's go through a really juicy Make example that works well for medium sized projects.
+Let's go through a really juicy Make example that works well for medium sized projects.
 
-    The neat thing about this makefile is it automatically determines dependencies for you. All you have to do is put your C/C++ files in the src/folder.
+The neat thing about this makefile is it automatically determines dependencies for you. All you have to do is put your C/C++ files in the src/folder.
 
-    # Thanks to Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
-    TARGET_EXEC := final_program
+    # Compiler to be used
+    CC = gcc
 
-    BUILD_DIR := ./build
-    SRC_DIRS := ./src
+    # Compiler flags
+    CFLAGS = -Wall
 
-    # Find all the C and C++ files we want to compile
-    # Note the single quotes around the * expressions. The shell will incorrectly expand these otherwise, but we want to send the * directly to the find command.
-    SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
+    # Target executable name
+    TARGET = test
 
-    # Prepends BUILD_DIR and appends .o to every src file
-    # As an example, ./your_dir/hello.cpp turns into ./build/./your_dir/hello.cpp.o
-    OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+    # Directory paths
+    SRC_DIR = src
+    BUILD_DIR = build
 
-    # String substitution (suffix version without %).
-    # As an example, ./build/hello.cpp.o turns into ./build/hello.cpp.d
-    DEPS := $(OBJS:.o=.d)
+    # Object files
+    OBJS = $(BUILD_DIR)/test.o
 
-    # Every folder in ./src will need to be passed to GCC so that it can find header files
-    INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-    # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
-    INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+    # Rule to compile the program
+    all: $(BUILD_DIR)/$(TARGET)
 
-    # The -MMD and -MP flags together generate Makefiles for us!
-    # These files will have .d instead of .o as the output.
-    CPPFLAGS := $(INC_FLAGS) -MMD -MP
+    $(BUILD_DIR)/$(TARGET): $(OBJS) | $(BUILD_DIR)
+        $(CC) $(CFLAGS) -o $(BUILD_DIR)/$(TARGET) $(OBJS)
 
-    # The final build step.
-    $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-        $(CXX) $(OBJS) -o $@ $(LDFLAGS)
+    $(BUILD_DIR)/test.o: $(SRC_DIR)/test.c | $(BUILD_DIR)
+        $(CC) $(CFLAGS) -c $(SRC_DIR)/test.c -o $(BUILD_DIR)/test.o
 
-    # Build step for C source
-    $(BUILD_DIR)/%.c.o: %.c
-        mkdir -p $(dir $@)
-        $(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+    # Create the build directory if it doesn't exist
+    $(BUILD_DIR):
+        mkdir -p $(BUILD_DIR)
 
-    # Build step for C++ source
-    $(BUILD_DIR)/%.cpp.o: %.cpp
-        mkdir -p $(dir $@)
-        $(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-
-    .PHONY: clean
+    # Clean up generated files
     clean:
-        rm -r $(BUILD_DIR)
-
-    # Include the .d makefiles. The - at the front suppresses the errors of missing
-    # Makefiles. Initially, all the .d files will be missing, and we don't want those
-    # errors to show up.
-    -include $(DEPS)
+        rm -rf $(BUILD_DIR)

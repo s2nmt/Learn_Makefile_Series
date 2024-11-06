@@ -1,17 +1,32 @@
-# Thanks to Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
-TARGET_EXEC := final_program
+# Compiler to be used
+CC = gcc
 
-BUILD_DIR := ./build
-SRC_DIRS := ./src
+# Compiler flags
+CFLAGS = -Wall
 
-# Find all the C and C++ files we want to compile
-# Note the single quotes around the * expressions. The shell will incorrectly expand these otherwise, but we want to send the * directly to the find command.
-SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
+# Target executable name
+TARGET = test
 
-# Prepends BUILD_DIR and appends .o to every src file
-# As an example, ./your_dir/hello.cpp turns into ./build/./your_dir/hello.cpp.o
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+# Directory paths
+SRC_DIR = src
+BUILD_DIR = build
 
-all:
-	echo $(SRCS)
-	echo $(OBJS)
+# Object files
+OBJS = $(BUILD_DIR)/test.o
+
+# Rule to compile the program
+all: $(BUILD_DIR)/$(TARGET)
+
+$(BUILD_DIR)/$(TARGET): $(OBJS) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)/$(TARGET) $(OBJS)
+
+$(BUILD_DIR)/test.o: $(SRC_DIR)/test.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $(SRC_DIR)/test.c -o $(BUILD_DIR)/test.o
+
+# Create the build directory if it doesn't exist
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+# Clean up generated files
+clean:
+	rm -rf $(BUILD_DIR)
